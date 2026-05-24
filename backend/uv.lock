@@ -861,7 +861,7 @@ wheels = [
 ]
 
 [[package]]
-name = "streaming-stock-pipeline"
+name = "tradelens"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
