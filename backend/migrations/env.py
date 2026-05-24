@@ -14,9 +14,9 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-from api.models import Base  # noqa: F401
-import api.models  # noqa: F401
-from api.database import DATABASE_URL
+from app.api.models import Base  # noqa: F401
+import app.api.models  # noqa: F401
+from app.api.database import DATABASE_URL
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

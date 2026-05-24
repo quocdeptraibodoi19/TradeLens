@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import insert
 
 
-from api.models import Symbol
+from app.api.models import Symbol
 
 load_dotenv()
 
