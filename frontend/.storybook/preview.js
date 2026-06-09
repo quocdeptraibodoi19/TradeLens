@@ -1,4 +1,18 @@
 import '../src/style.css'
+import { setup } from '@storybook/vue3'
+import { createRouter, createMemoryHistory } from 'vue-router'
+
+export const storybookRouter = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    { path: '/', redirect: '/home' },
+    { path: '/:pathMatch(.*)*', component: { template: '<div />' } },
+  ],
+})
+
+setup((app) => {
+  app.use(storybookRouter)
+})
 
 /** @type { import('@storybook/vue3-vite').Preview } */
 const preview = {
