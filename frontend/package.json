@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "deploy-storybook": "storybook build --output-dir storybook-static && netlify deploy --dir storybook-static --prod"
+    "deploy-storybook": "storybook build --output-dir storybook-static && npx netlify-cli deploy --dir storybook-static --prod"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
