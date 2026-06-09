@@ -56,7 +56,7 @@ const render = (args) => ({
   `,
 })
 
-export const Playground = { render }
+export const Default = { render }
 
 export const Primary   = { args: { variant: 'primary'  }, render }
 export const Accent    = { args: { variant: 'accent'   }, render }
