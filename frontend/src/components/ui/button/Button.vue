@@ -5,7 +5,7 @@ import { buttonVariants } from ".";
 
 const props = defineProps({
   variant: { type: null, required: false },
-  size: { type: null, required: false },
+  iconPosition: { type: String, required: false, default: "none" },
   class: {
     type: [Boolean, null, String, Object, Array],
     required: false,
@@ -20,11 +20,20 @@ const props = defineProps({
   <Primitive
     data-slot="button"
     :data-variant="variant"
-    :data-size="size"
     :as="as"
     :as-child="asChild"
-    :class="cn(buttonVariants({ variant, size }), props.class)"
+    :class="cn(buttonVariants({ variant, iconPosition }), props.class)"
   >
-    <slot />
+    <span v-if="iconPosition === 'left'" class="shrink-0 size-6 flex items-center justify-center">
+      <slot name="icon" />
+    </span>
+
+    <span class="flex items-center justify-center px-2xsmall">
+      <slot />
+    </span>
+
+    <span v-if="iconPosition === 'right'" class="shrink-0 size-6 flex items-center justify-center">
+      <slot name="icon" />
+    </span>
   </Primitive>
 </template>

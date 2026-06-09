@@ -3,38 +3,49 @@ import { cva } from "class-variance-authority";
 export { default as Button } from "./Button.vue";
 
 export const buttonVariants = cva(
-  "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 rounded-lg border border-transparent bg-clip-padding text-sm font-medium focus-visible:ring-3 aria-invalid:ring-3 active:not-aria-[haspopup]:translate-y-px [&_svg:not([class*=size-])]:size-4 group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "inline-flex shrink-0 items-center justify-center whitespace-nowrap select-none outline-none " +
+  "rounded-action " +
+  "text-button leading-button font-semibold font-sans " +
+  "transition-colors " +
+  "disabled:pointer-events-none " +
+  "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring/50 " +
+  "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
-        outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+        primary:
+          "bg-bg-fill-neutral-default hover:bg-bg-fill-neutral-hover active:bg-bg-fill-neutral-press " +
+          "disabled:bg-bg-fill-disabled " +
+          "text-content-inverse " +
+          "px-medium py-xsmall",
+        accent:
+          "bg-bg-fill-primary-default hover:bg-bg-fill-primary-hover active:bg-bg-fill-primary-press " +
+          "disabled:bg-bg-fill-disabled " +
+          "text-content-neutral-strong active:text-content-inverse disabled:text-content-inverse " +
+          "px-medium py-xsmall",
         ghost:
-          "hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground",
-        destructive:
-          "bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30",
-        link: "text-primary underline-offset-4 hover:underline",
+          "hover:bg-bg-fill-neutral-flat-hover active:bg-bg-fill-neutral-flat-press " +
+          "text-content-neutral-strong disabled:text-content-disabled " +
+          "px-medium py-xsmall",
+        danger:
+          "bg-bg-fill-negative-default hover:bg-bg-fill-negative-hover active:bg-bg-fill-negative-press " +
+          "disabled:bg-bg-fill-disabled " +
+          "text-content-inverse " +
+          "px-medium py-xsmall",
+        flat:
+          "text-content-neutral-strong hover:text-content-neutral-medium " +
+          "active:text-content-neutral-strong disabled:text-content-disabled " +
+          "px-2xsmall py-0",
       },
-      size: {
-        default:
-          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*=size-])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        icon: "size-8",
-        "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*=size-])]:size-3",
-        "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-9",
+      iconPosition: {
+        none:  "gap-0",
+        left:  "gap-2xsmall",
+        right: "gap-2xsmall",
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
+      variant: "primary",
+      iconPosition: "none",
     },
   },
 );
