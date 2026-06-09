@@ -15,7 +15,9 @@ const props = defineProps({
     data-slot="table-cell"
     :class="
       cn(
-        'p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0',
+        'border-b border-border-neutral-light-default',
+        'px-small h-[56px]',
+        'group-hover:bg-bg-fill-neutral-flat-hover transition-colors',
         props.class,
       )
     "
