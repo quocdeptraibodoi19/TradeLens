@@ -8,9 +8,15 @@
     "build": "vite build",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "deploy-storybook": "storybook build --output-dir storybook-static && netlify deploy --dir storybook-static --prod"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-brands-svg-icons": "^7.2.0",
+    "@fortawesome/pro-regular-svg-icons": "^7.2.0",
+    "@fortawesome/pro-solid-svg-icons": "^7.2.0",
+    "@fortawesome/vue-fontawesome": "^3.2.0",
     "@lucide/vue": "^1.17.0",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/vue-table": "^8.21.3",
@@ -27,19 +33,18 @@
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.6",
-    "vite": "^8.0.8",
-    "vite-plugin-vue-devtools": "^8.1.1",
-    "storybook": "^10.4.2",
-    "@storybook/vue3-vite": "^10.4.2",
-    "@chromatic-com/storybook": "^5.2.1",
-    "@storybook/addon-vitest": "^10.4.2",
     "@storybook/addon-a11y": "^10.4.2",
     "@storybook/addon-docs": "^10.4.2",
-    "vitest": "^4.1.8",
-    "playwright": "^1.60.0",
+    "@storybook/addon-vitest": "^10.4.2",
+    "@storybook/vue3-vite": "^10.4.2",
+    "@vitejs/plugin-vue": "^6.0.6",
     "@vitest/browser-playwright": "^4.1.8",
-    "@vitest/coverage-v8": "^4.1.8"
+    "@vitest/coverage-v8": "^4.1.8",
+    "playwright": "^1.60.0",
+    "storybook": "^10.4.2",
+    "vite": "^8.0.8",
+    "vite-plugin-vue-devtools": "^8.1.1",
+    "vitest": "^4.1.8"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
