@@ -317,6 +317,8 @@
   --radius-medium:  var(--radius-medium);
   --radius-small:   var(--radius-small);
   --radius-xsmall:  var(--radius-xsmall);
+  --radius-2xsmall: var(--radius-2xsmall);
+  --radius-3xsmall: var(--radius-3xsmall);
 
   /* ── Spacing utilities (px-*, py-*, gap-*, m-*, w-*, h-* …) ── */
   /* Aliases the padding/gap scale from tokens.css under --spacing-* so   */
