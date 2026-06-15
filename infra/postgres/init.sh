@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname alphaca_alerts <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "tradelens" <<-EOSQL
 
     -- Debezium
     CREATE USER ${DEBEZIUM_DB_USER} WITH REPLICATION LOGIN PASSWORD '${DEBEZIUM_DB_PASSWORD}';
@@ -11,7 +11,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname alphaca_alerts <<-E
 
     -- FastAPI app
     CREATE USER ${APP_DB_USER} WITH LOGIN PASSWORD '${APP_DB_PASSWORD}';
-    GRANT CONNECT ON DATABASE alphaca_alerts TO ${APP_DB_USER};
+    GRANT CONNECT ON DATABASE tradelens TO ${APP_DB_USER};
     GRANT USAGE, CREATE ON SCHEMA public TO ${APP_DB_USER};
     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ${APP_DB_USER};
     GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO ${APP_DB_USER};

@@ -1,12 +1,12 @@
 services:
   postgres:
     image: postgres:15.3
-    container_name: alphaca_alert_postgres
+    container_name: tradelens_postgres
     restart: unless-stopped
     env_file:
-      - ../../.env
+      - ../.env
     environment:
-      POSTGRES_DB: alphaca_alerts
+      POSTGRES_DB: tradelens
     ports:
       - "5432:5432"
     volumes:
