@@ -1,0 +1,390 @@
+/* =============================================================================
+   DESIGN TOKENS
+   3-tier colour architecture mirroring Figma variable collections:
+     Block 1 — Global   (colors-primitive.json)  raw hex + alpha values
+     Block 2 — Base     (colors-scale.json)       named colour scale aliases
+     Block 3 — Semantic (colors-semantic.json)    usage / mode tokens
+     Block 4 — Non-colour primitives              typography, radius, spacing
+   ============================================================================= */
+
+/* ── BLOCK 1: Global (Primitive) colour vars ─────────────────────────────── */
+:root {
+  /* Light/Amber-Alpha  →  Primary colour ramp */
+  --primitive-amber-alpha-1:  rgba(192, 128, 0, 0.0157);
+  --primitive-amber-alpha-2:  rgba(255, 179, 0, 0.0784);
+  --primitive-amber-alpha-3:  rgba(255, 163, 0, 0.1412);
+  --primitive-amber-alpha-4:  rgba(255, 159, 0, 0.2392);
+  --primitive-amber-alpha-5:  rgba(255, 161, 0, 0.3608);
+  --primitive-amber-alpha-6:  rgba(255, 159, 0, 0.5176);
+  --primitive-amber-alpha-7:  rgba(231, 140, 0, 0.5804);
+  --primitive-amber-alpha-8:  rgba(214, 134, 0, 0.7529);
+  --primitive-amber-alpha-9:  rgba(255, 167, 0, 0.7020);
+  --primitive-amber-alpha-10: rgba(255, 166, 0, 0.8157);
+  --primitive-amber-alpha-11: #9F6C00;
+  --primitive-amber-alpha-12: rgba(49, 30, 0, 0.8824);
+
+  /* Light/Sand-Alpha  →  Neutral colour ramp */
+  --primitive-sand-alpha-1:   rgba(85, 85, 0, 0.0118);
+  --primitive-sand-alpha-2:   rgba(66, 66, 0, 0.0300);
+  --primitive-sand-alpha-3:   rgba(45, 30, 0, 0.0667);
+  --primitive-sand-alpha-4:   rgba(50, 30, 0, 0.1020);
+  --primitive-sand-alpha-5:   rgba(38, 30, 0, 0.1333);
+  --primitive-sand-alpha-6:   rgba(42, 30, 1, 0.1686);
+  --primitive-sand-alpha-7:   rgba(42, 28, 0, 0.2157);
+  --primitive-sand-alpha-8:   rgba(37, 27, 0, 0.2980);
+  --primitive-sand-alpha-9:   rgba(27, 19, 0, 0.4863);
+  --primitive-sand-alpha-10:  rgba(23, 18, 0, 0.5255);
+  --primitive-sand-alpha-11:  rgba(14, 11, 0, 0.6392);
+  --primitive-sand-alpha-12:  rgba(9, 7, 0, 0.8980);
+
+  /* Light/Tomato-Alpha  →  Negative / error colour ramp */
+  --primitive-tomato-alpha-1:  rgba(255, 0, 0, 0.0118);
+  --primitive-tomato-alpha-2:  rgba(255, 32, 0, 0.0314);
+  --primitive-tomato-alpha-3:  rgba(245, 43, 0, 0.0941);
+  --primitive-tomato-alpha-4:  rgba(255, 53, 0, 0.1725);
+  --primitive-tomato-alpha-5:  rgba(255, 50, 0, 0.2431);
+  --primitive-tomato-alpha-6:  rgba(249, 48, 0, 0.3176);
+  --primitive-tomato-alpha-7:  rgba(231, 45, 0, 0.4078);
+  --primitive-tomato-alpha-8:  rgba(219, 41, 0, 0.5216);
+  --primitive-tomato-alpha-9:  rgba(223, 38, 0, 0.8196);
+  --primitive-tomato-alpha-10: rgba(210, 36, 0, 0.8863);
+  --primitive-tomato-alpha-11: rgba(203, 36, 0, 0.9137);
+  --primitive-tomato-alpha-12: rgba(72, 14, 0, 0.8902);
+
+  /* Light/Indigo-Alpha  →  Display: indigo */
+  --primitive-indigo-alpha-1:  rgba(0, 0, 255, 0.0078);
+  --primitive-indigo-alpha-2:  rgba(0, 64, 255, 0.0314);
+  --primitive-indigo-alpha-3:  rgba(0, 71, 255, 0.0706);
+  --primitive-indigo-alpha-4:  rgba(0, 75, 255, 0.1216);
+  --primitive-indigo-alpha-5:  rgba(0, 73, 255, 0.1804);
+  --primitive-indigo-alpha-6:  rgba(0, 65, 255, 0.2471);
+  --primitive-indigo-alpha-7:  rgba(0, 54, 255, 0.3333);
+  --primitive-indigo-alpha-8:  rgba(0, 49, 240, 0.4510);
+  --primitive-indigo-alpha-9:  rgba(0, 22, 219, 0.7176);
+  --primitive-indigo-alpha-10: rgba(0, 19, 186, 0.7529);
+  --primitive-indigo-alpha-11: rgba(0, 22, 194, 0.7333);
+  --primitive-indigo-alpha-12: rgba(0, 10, 76, 0.8706);
+
+  /* Light/Pink-Alpha  →  Display: pink */
+  --primitive-pink-alpha-1:  rgba(255, 0, 170, 0.0118);
+  --primitive-pink-alpha-2:  rgba(255, 0, 128, 0.0314);
+  --primitive-pink-alpha-3:  rgba(255, 0, 128, 0.0863);
+  --primitive-pink-alpha-4:  rgba(241, 0, 128, 0.1412);
+  --primitive-pink-alpha-5:  rgba(219, 0, 115, 0.1922);
+  --primitive-pink-alpha-6:  rgba(204, 0, 110, 0.2549);
+  --primitive-pink-alpha-7:  rgba(192, 0, 104, 0.3294);
+  --primitive-pink-alpha-8:  rgba(183, 0, 103, 0.4275);
+  --primitive-pink-alpha-9:  rgba(207, 0, 134, 0.7451);
+  --primitive-pink-alpha-10: rgba(192, 0, 127, 0.8039);
+  --primitive-pink-alpha-11: rgba(182, 0, 123, 0.8510);
+  --primitive-pink-alpha-12: rgba(92, 0, 62, 0.9373);
+
+  /* Light/Gray-Alpha  →  Display: gray */
+  --primitive-gray-alpha-1:  rgba(0, 0, 0, 0.0118);
+  --primitive-gray-alpha-2:  rgba(0, 0, 0, 0.0235);
+  --primitive-gray-alpha-3:  rgba(0, 0, 0, 0.0627);
+  --primitive-gray-alpha-4:  rgba(0, 0, 0, 0.0902);
+  --primitive-gray-alpha-5:  rgba(0, 0, 0, 0.1216);
+  --primitive-gray-alpha-6:  rgba(0, 0, 0, 0.1529);
+  --primitive-gray-alpha-7:  rgba(0, 0, 0, 0.1922);
+  --primitive-gray-alpha-8:  rgba(0, 0, 0, 0.2667);
+  --primitive-gray-alpha-9:  rgba(0, 0, 0, 0.4471);
+  --primitive-gray-alpha-10: rgba(0, 0, 0, 0.4863);
+  --primitive-gray-alpha-11: rgba(0, 0, 0, 0.6078);
+  --primitive-gray-alpha-12: rgba(0, 0, 0, 0.8745);
+
+  /* Light/Yellow-Alpha  →  Display: yellow */
+  --primitive-yellow-alpha-1:  rgba(204, 153, 0, 0.0196);
+  --primitive-yellow-alpha-2:  rgba(255, 200, 0, 0.0902);
+  --primitive-yellow-alpha-3:  rgba(255, 198, 0, 0.1922);
+  --primitive-yellow-alpha-4:  rgba(255, 198, 0, 0.3294);
+  --primitive-yellow-alpha-5:  rgba(255, 197, 0, 0.5098);
+  --primitive-yellow-alpha-6:  rgba(245, 180, 0, 0.5725);
+  --primitive-yellow-alpha-7:  rgba(216, 158, 0, 0.6157);
+  --primitive-yellow-alpha-8:  rgba(202, 152, 0, 0.8078);
+  --primitive-yellow-alpha-9:  #FFCE00;
+  --primitive-yellow-alpha-10: #F9C500;
+  --primitive-yellow-alpha-11: #947300;
+  --primitive-yellow-alpha-12: rgba(45, 33, 0, 0.8863);
+
+  /* Light/Blue-Alpha  →  Display: blue */
+  --primitive-blue-alpha-1:  rgba(0, 128, 255, 0.0157);
+  --primitive-blue-alpha-2:  rgba(0, 116, 255, 0.0431);
+  --primitive-blue-alpha-3:  rgba(0, 122, 255, 0.0902);
+  --primitive-blue-alpha-4:  rgba(0, 128, 255, 0.1490);
+  --primitive-blue-alpha-5:  rgba(0, 128, 255, 0.2196);
+  --primitive-blue-alpha-6:  rgba(0, 118, 255, 0.3059);
+  --primitive-blue-alpha-7:  rgba(1, 114, 255, 0.4157);
+  --primitive-blue-alpha-8:  rgba(0, 112, 248, 0.5804);
+  --primitive-blue-alpha-9:  #0087FF;
+  --primitive-blue-alpha-10: #007AF1;
+  --primitive-blue-alpha-11: #005EC2;
+  --primitive-blue-alpha-12: #003368;
+
+  /* Light/Green-Alpha  →  Display: green */
+  --primitive-green-alpha-1:  rgba(0, 204, 51, 0.0196);
+  --primitive-green-alpha-2:  rgba(0, 153, 0, 0.0392);
+  --primitive-green-alpha-3:  rgba(0, 170, 11, 0.0941);
+  --primitive-green-alpha-4:  rgba(0, 173, 20, 0.1569);
+  --primitive-green-alpha-5:  rgba(1, 165, 22, 0.2314);
+  --primitive-green-alpha-6:  rgba(0, 160, 22, 0.3255);
+  --primitive-green-alpha-7:  rgba(0, 154, 25, 0.4549);
+  --primitive-green-alpha-8:  rgba(0, 155, 34, 0.6588);
+  --primitive-green-alpha-9:  rgba(0, 153, 45, 0.8314);
+  --primitive-green-alpha-10: rgba(0, 143, 45, 0.8745);
+  --primitive-green-alpha-11: rgba(0, 126, 48, 0.9804);
+  --primitive-green-alpha-12: rgba(0, 37, 7, 0.8902);
+
+  /* Static */
+  --primitive-white: #FFFFFF;
+  --primitive-black: #000000;
+}
+
+/* ── BLOCK 2: Base (Scale) vars ──────────────────────────────────────────── */
+/* Step → primitive index: 50→1, 100→2, 200→3, 300→4, 400→5, 500→6,        */
+/*                         600→7, 700→8, 800→9, 900→10, 950→11, 1000→12    */
+:root {
+  /* light-color/neutral  (Sand-Alpha) */
+  --base-neutral-50:   var(--primitive-sand-alpha-1);
+  --base-neutral-100:  var(--primitive-sand-alpha-2);
+  --base-neutral-200:  var(--primitive-sand-alpha-3);
+  --base-neutral-300:  var(--primitive-sand-alpha-4);
+  --base-neutral-400:  var(--primitive-sand-alpha-5);
+  --base-neutral-500:  var(--primitive-sand-alpha-6);
+  --base-neutral-600:  var(--primitive-sand-alpha-7);
+  --base-neutral-700:  var(--primitive-sand-alpha-8);
+  --base-neutral-800:  var(--primitive-sand-alpha-9);
+  --base-neutral-900:  var(--primitive-sand-alpha-10);
+  --base-neutral-950:  var(--primitive-sand-alpha-11);
+  --base-neutral-1000: var(--primitive-sand-alpha-12);
+
+  /* light-color/primary  (Amber-Alpha) */
+  --base-primary-50:   var(--primitive-amber-alpha-1);
+  --base-primary-100:  var(--primitive-amber-alpha-2);
+  --base-primary-200:  var(--primitive-amber-alpha-3);
+  --base-primary-300:  var(--primitive-amber-alpha-4);
+  --base-primary-400:  var(--primitive-amber-alpha-5);
+  --base-primary-500:  var(--primitive-amber-alpha-6);
+  --base-primary-600:  var(--primitive-amber-alpha-7);
+  --base-primary-700:  var(--primitive-amber-alpha-8);
+  --base-primary-800:  var(--primitive-amber-alpha-9);
+  --base-primary-900:  var(--primitive-amber-alpha-10);
+  --base-primary-950:  var(--primitive-amber-alpha-11);
+  --base-primary-1000: var(--primitive-amber-alpha-12);
+
+  /* light-color/negative  (Tomato-Alpha) */
+  --base-negative-50:   var(--primitive-tomato-alpha-1);
+  --base-negative-100:  var(--primitive-tomato-alpha-2);
+  --base-negative-200:  var(--primitive-tomato-alpha-3);
+  --base-negative-300:  var(--primitive-tomato-alpha-4);
+  --base-negative-400:  var(--primitive-tomato-alpha-5);
+  --base-negative-500:  var(--primitive-tomato-alpha-6);
+  --base-negative-600:  var(--primitive-tomato-alpha-7);
+  --base-negative-700:  var(--primitive-tomato-alpha-8);
+  --base-negative-800:  var(--primitive-tomato-alpha-9);
+  --base-negative-900:  var(--primitive-tomato-alpha-10);
+  --base-negative-950:  var(--primitive-tomato-alpha-11);
+  --base-negative-1000: var(--primitive-tomato-alpha-12);
+}
+
+/* ── BLOCK 3: Mode / Semantic colour vars ────────────────────────────────── */
+:root {
+  /* content/* */
+  --color-content-neutral-strong: var(--base-neutral-1000);
+  --color-content-neutral-medium: var(--base-neutral-950);
+  --color-content-neutral-light:  var(--base-neutral-800);
+  --color-content-inverse:        var(--primitive-white);
+  --color-content-disabled:       var(--base-neutral-700);
+  --color-content-negative:       var(--base-negative-900);
+  --color-content-placeholder:    var(--base-neutral-700);
+
+  /* bg/* */
+  --color-bg-surface:                       var(--primitive-white);
+  --color-bg-canvas:                        var(--base-primary-50);
+  --color-bg-canvas-alt:                    var(--primitive-white);
+  --color-bg-fill-disabled:                 var(--base-neutral-700);
+
+  --color-bg-fill-primary-default:          var(--base-primary-800);
+  --color-bg-fill-primary-hover:            var(--base-primary-900);
+  --color-bg-fill-primary-press:            var(--base-primary-950);
+  --color-bg-fill-primary-selected:         var(--base-primary-800);
+  --color-bg-fill-primary-flat-hover:       var(--base-primary-200);
+  --color-bg-fill-primary-flat-selected:    var(--base-primary-200);
+
+  --color-bg-fill-neutral-default:          var(--base-neutral-1000);
+  --color-bg-fill-neutral-hover:            var(--base-neutral-950);
+  --color-bg-fill-neutral-press:            var(--base-neutral-900);
+  --color-bg-fill-neutral-selected:         var(--base-neutral-1000);
+  --color-bg-fill-neutral-subtle-default:   var(--base-neutral-100);
+  --color-bg-fill-neutral-subtle-hover:     var(--base-neutral-200);
+  --color-bg-fill-neutral-subtle-press:     var(--base-neutral-300);
+  --color-bg-fill-neutral-subtle-selected:  var(--base-neutral-1000);
+  --color-bg-fill-neutral-flat-hover:       var(--base-neutral-200);
+  --color-bg-fill-neutral-flat-press:       var(--base-neutral-300);
+  --color-bg-fill-neutral-flat-selected:    var(--base-neutral-200);
+
+  --color-bg-fill-negative-default:         var(--base-negative-800);
+  --color-bg-fill-negative-hover:           var(--base-negative-900);
+  --color-bg-fill-negative-press:           var(--base-negative-950);
+  --color-bg-fill-negative-selected:        var(--base-negative-800);
+  --color-bg-fill-negative-subtle-default:  var(--primitive-white);
+  --color-bg-fill-negative-subtle-hover:    var(--primitive-white);
+  --color-bg-fill-negative-subtle-press:    var(--primitive-white);
+  --color-bg-fill-negative-subtle-selected: var(--primitive-white);
+  --color-bg-fill-negative-flat-hover:      var(--base-negative-200);
+  --color-bg-fill-negative-flat-press:      var(--base-negative-300);
+  --color-bg-fill-negative-flat-selected:   var(--base-negative-200);
+
+  /* border/* */
+  --color-border-disabled:                  var(--base-neutral-200);
+
+  --color-border-neutral-strong-default:    var(--base-neutral-1000);
+  --color-border-neutral-strong-hover:      var(--base-neutral-400);
+  --color-border-neutral-strong-press:      var(--base-neutral-500);
+  --color-border-neutral-strong-selected:   var(--base-neutral-1000);
+
+  --color-border-neutral-medium-default:    var(--base-neutral-1000);
+  --color-border-neutral-medium-hover:      var(--base-neutral-400);
+  --color-border-neutral-medium-press:      var(--base-neutral-500);
+  --color-border-neutral-medium-selected:   var(--base-neutral-1000);
+
+  --color-border-neutral-light-default:     var(--base-neutral-300);
+  --color-border-neutral-light-hover:       var(--base-neutral-400);
+  --color-border-neutral-light-press:       var(--base-neutral-500);
+  --color-border-neutral-light-selected:    var(--base-neutral-1000);
+
+  --color-border-neutral-lightest-default:  var(--base-neutral-100);
+  --color-border-neutral-lightest-hover:    var(--base-neutral-200);
+  --color-border-neutral-lightest-press:    var(--base-neutral-300);
+  --color-border-neutral-lightest-selected: var(--base-neutral-1000);
+
+  --color-border-negative-default:          var(--base-negative-800);
+  --color-border-negative-hover:            var(--base-negative-900);
+  --color-border-negative-press:            var(--base-negative-950);
+  --color-border-negative-selected:         var(--base-negative-800);
+
+  /* display/* — reference Global primitives directly */
+  --color-display-indigo-strong:    var(--primitive-indigo-alpha-12);
+  --color-display-indigo-default:   var(--primitive-indigo-alpha-9);
+  --color-display-indigo-medium:    var(--primitive-indigo-alpha-6);
+  --color-display-indigo-light:     var(--primitive-indigo-alpha-3);
+  --color-display-indigo-on-subtle: var(--primitive-indigo-alpha-11);
+
+  --color-display-pink-strong:      var(--primitive-pink-alpha-12);
+  --color-display-pink-default:     var(--primitive-pink-alpha-9);
+  --color-display-pink-medium:      var(--primitive-pink-alpha-6);
+  --color-display-pink-light:       var(--primitive-pink-alpha-3);
+  --color-display-pink-on-subtle:   var(--primitive-pink-alpha-11);
+
+  --color-display-gray-strong:      var(--primitive-gray-alpha-12);
+  --color-display-gray-default:     var(--primitive-gray-alpha-9);
+  --color-display-gray-medium:      var(--primitive-gray-alpha-6);
+  --color-display-gray-light:       var(--primitive-gray-alpha-3);
+  --color-display-gray-on-subtle:   var(--primitive-gray-alpha-11);
+
+  --color-display-yellow-strong:    var(--primitive-yellow-alpha-12);
+  --color-display-yellow-default:   var(--primitive-yellow-alpha-9);
+  --color-display-yellow-medium:    var(--primitive-yellow-alpha-6);
+  --color-display-yellow-light:     var(--primitive-yellow-alpha-3);
+  --color-display-yellow-on-subtle: var(--primitive-yellow-alpha-11);
+
+  --color-display-blue-strong:      var(--primitive-blue-alpha-12);
+  --color-display-blue-default:     var(--primitive-blue-alpha-9);
+  --color-display-blue-medium:      var(--primitive-blue-alpha-6);
+  --color-display-blue-light:       var(--primitive-blue-alpha-3);
+  --color-display-blue-on-subtle:   var(--primitive-blue-alpha-11);
+
+  --color-display-green-strong:     var(--primitive-green-alpha-12);
+  --color-display-green-default:    var(--primitive-green-alpha-9);
+  --color-display-green-medium:     var(--primitive-green-alpha-8);
+  --color-display-green-light:      var(--primitive-green-alpha-3);
+  --color-display-green-on-subtle:  var(--primitive-green-alpha-11);
+
+  /* Red display → Tomato-Alpha (same ramp as negative) */
+  --color-display-red-strong:       var(--primitive-tomato-alpha-12);
+  --color-display-red-default:      var(--primitive-tomato-alpha-9);
+  --color-display-red-medium:       var(--primitive-tomato-alpha-6);
+  --color-display-red-light:        var(--primitive-tomato-alpha-3);
+  --color-display-red-on-subtle:    var(--primitive-tomato-alpha-11);
+
+  /* Primary display → Base layer */
+  --color-display-primary-strong:    var(--base-primary-1000);
+  --color-display-primary-default:   var(--base-primary-800);
+  --color-display-primary-medium:    var(--base-primary-400);
+  --color-display-primary-light:     var(--base-primary-200);
+  --color-display-primary-on-subtle: var(--base-primary-950);
+}
+
+/* ── BLOCK 4: Non-colour primitive tokens ────────────────────────────────── */
+:root {
+  /* Font families */
+  --font-family-sans:    Inter, sans-serif;
+  --font-family-display: Merriweather, serif;
+
+  /* Font weights */
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* Font sizes */
+  --font-size-display:    40px;
+  --font-size-h1:         32px;
+  --font-size-h2:         24px;
+  --font-size-h3:         20px;
+  --font-size-h4:         18px;
+  --font-size-body:       16px;
+  --font-size-body-small: 14px;
+  --font-size-caption:    12px;
+  --font-size-small-label: 10px;
+  --font-size-button:     16px;
+
+  /* Line heights */
+  --line-height-display:    48px;
+  --line-height-h1:         40px;
+  --line-height-h2:         32px;
+  --line-height-h3:         28px;
+  --line-height-h4:         24px;
+  --line-height-body:       24px;
+  --line-height-body-small: 20px;
+  --line-height-caption:    16px;
+  --line-height-small-label: 12px;
+  --line-height-button:     24px;
+
+  /* Border radius */
+  --radius-action:  8px;
+  --radius-rounded: 1000px;
+  --radius-xlarge:  40px;
+  --radius-large:   32px;
+  --radius-medium:  24px;
+  --radius-small:   16px;
+  --radius-xsmall:  12px;
+  --radius-2xsmall: 8px;
+  --radius-3xsmall: 4px;
+
+  /* Padding */
+  --padding-4xlarge: 40px;
+  --padding-3xlarge: 32px;
+  --padding-2xlarge: 28px;
+  --padding-xlarge:  24px;
+  --padding-large:   20px;
+  --padding-medium:  16px;
+  --padding-small:   12px;
+  --padding-xsmall:  8px;
+  --padding-2xsmall: 4px;
+  --padding-3xsmall: 2px;
+
+  /* Gap */
+  --gap-6xlarge: 128px;
+  --gap-5xlarge: 80px;
+  --gap-4xlarge: 64px;
+  --gap-3xlarge: 48px;
+  --gap-2xlarge: 32px;
+  --gap-xlarge:  24px;
+  --gap-large:   20px;
+  --gap-medium:  16px;
+  --gap-small:   12px;
+  --gap-xsmall:  8px;
+  --gap-2xsmall: 4px;
+  --gap-3xsmall: 2px;
+}

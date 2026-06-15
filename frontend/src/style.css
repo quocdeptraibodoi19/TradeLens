@@ -1,0 +1,453 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@import "./design-tokens/tokens.css";
+@import "tw-animate-css";
+@import "shadcn-vue/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* =============================================================================
+   Typography composite styles
+   Each class bundles the 4 properties that define a Figma text style:
+   font-family + font-size + line-height + font-weight.
+
+   Weight variants:
+     light  → --font-weight-normal   (400)
+     medium → --font-weight-medium   (500)
+     strong → --font-weight-semibold (600)
+
+   Only Display uses --font-family-display (Merriweather).
+   All other styles use --font-family-sans (Inter).
+   ============================================================================= */
+@layer components {
+  /* Display — medium + strong */
+  .text-display-medium {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-display);
+    line-height: var(--line-height-display);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-display-strong {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-display);
+    line-height: var(--line-height-display);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* H1 — medium + strong */
+  .text-h1-medium {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-h1-strong {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* H2 — medium + strong */
+  .text-h2-medium {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-h2-strong {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* H3 — medium + strong */
+  .text-h3-medium {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-h3-strong {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Body — light + medium + strong */
+  .text-body-light {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: var(--font-weight-normal);
+  }
+  .text-body-medium {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-body-strong {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Body-Small — light + medium + strong */
+  .text-body-small-light {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body-small);
+    line-height: var(--line-height-body-small);
+    font-weight: var(--font-weight-normal);
+  }
+  .text-body-small-medium {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body-small);
+    line-height: var(--line-height-body-small);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-body-small-strong {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body-small);
+    line-height: var(--line-height-body-small);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Caption — light + medium + strong */
+  .text-caption-light {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    font-weight: var(--font-weight-normal);
+  }
+  .text-caption-medium {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    font-weight: var(--font-weight-medium);
+  }
+  .text-caption-strong {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* Button-label */
+  .text-button-label {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-button);
+    line-height: var(--line-height-button);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* Small-label */
+  .text-small-label {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-small-label);
+    line-height: var(--line-height-small-label);
+    font-weight: var(--font-weight-normal);
+  }
+}
+
+/* =============================================================================
+   Tailwind theme — exposes every semantic token from tokens.css as a Tailwind
+   utility, using the exact same variable name so utility classes mirror tokens:
+     bg-bg-fill-primary-default, text-content-neutral-strong, etc.
+   Uses `inline` so values stay as var() references (supports runtime theming).
+   Dark mode overrides go in a .dark {} block added later.
+   ============================================================================= */
+@theme inline {
+  /* ── content/* ── */
+  --color-content-neutral-strong: var(--color-content-neutral-strong);
+  --color-content-neutral-medium: var(--color-content-neutral-medium);
+  --color-content-neutral-light:  var(--color-content-neutral-light);
+  --color-content-inverse:        var(--color-content-inverse);
+  --color-content-disabled:       var(--color-content-disabled);
+  --color-content-negative:       var(--color-content-negative);
+  --color-content-placeholder:    var(--color-content-placeholder);
+
+  /* ── bg/* ── */
+  --color-bg-surface:                       var(--color-bg-surface);
+  --color-bg-canvas:                        var(--color-bg-canvas);
+  --color-bg-canvas-alt:                    var(--color-bg-canvas-alt);
+  --color-bg-fill-disabled:                 var(--color-bg-fill-disabled);
+
+  --color-bg-fill-primary-default:          var(--color-bg-fill-primary-default);
+  --color-bg-fill-primary-hover:            var(--color-bg-fill-primary-hover);
+  --color-bg-fill-primary-press:            var(--color-bg-fill-primary-press);
+  --color-bg-fill-primary-selected:         var(--color-bg-fill-primary-selected);
+  --color-bg-fill-primary-flat-hover:       var(--color-bg-fill-primary-flat-hover);
+  --color-bg-fill-primary-flat-selected:    var(--color-bg-fill-primary-flat-selected);
+
+  --color-bg-fill-neutral-default:          var(--color-bg-fill-neutral-default);
+  --color-bg-fill-neutral-hover:            var(--color-bg-fill-neutral-hover);
+  --color-bg-fill-neutral-press:            var(--color-bg-fill-neutral-press);
+  --color-bg-fill-neutral-selected:         var(--color-bg-fill-neutral-selected);
+  --color-bg-fill-neutral-subtle-default:   var(--color-bg-fill-neutral-subtle-default);
+  --color-bg-fill-neutral-subtle-hover:     var(--color-bg-fill-neutral-subtle-hover);
+  --color-bg-fill-neutral-subtle-press:     var(--color-bg-fill-neutral-subtle-press);
+  --color-bg-fill-neutral-subtle-selected:  var(--color-bg-fill-neutral-subtle-selected);
+  --color-bg-fill-neutral-flat-hover:       var(--color-bg-fill-neutral-flat-hover);
+  --color-bg-fill-neutral-flat-press:       var(--color-bg-fill-neutral-flat-press);
+  --color-bg-fill-neutral-flat-selected:    var(--color-bg-fill-neutral-flat-selected);
+
+  --color-bg-fill-negative-default:         var(--color-bg-fill-negative-default);
+  --color-bg-fill-negative-hover:           var(--color-bg-fill-negative-hover);
+  --color-bg-fill-negative-press:           var(--color-bg-fill-negative-press);
+  --color-bg-fill-negative-selected:        var(--color-bg-fill-negative-selected);
+  --color-bg-fill-negative-subtle-default:  var(--color-bg-fill-negative-subtle-default);
+  --color-bg-fill-negative-subtle-hover:    var(--color-bg-fill-negative-subtle-hover);
+  --color-bg-fill-negative-subtle-press:    var(--color-bg-fill-negative-subtle-press);
+  --color-bg-fill-negative-subtle-selected: var(--color-bg-fill-negative-subtle-selected);
+  --color-bg-fill-negative-flat-hover:      var(--color-bg-fill-negative-flat-hover);
+  --color-bg-fill-negative-flat-press:      var(--color-bg-fill-negative-flat-press);
+  --color-bg-fill-negative-flat-selected:   var(--color-bg-fill-negative-flat-selected);
+
+  /* ── border/* ── */
+  --color-border-disabled:                  var(--color-border-disabled);
+
+  --color-border-neutral-strong-default:    var(--color-border-neutral-strong-default);
+  --color-border-neutral-strong-hover:      var(--color-border-neutral-strong-hover);
+  --color-border-neutral-strong-press:      var(--color-border-neutral-strong-press);
+  --color-border-neutral-strong-selected:   var(--color-border-neutral-strong-selected);
+
+  --color-border-neutral-medium-default:    var(--color-border-neutral-medium-default);
+  --color-border-neutral-medium-hover:      var(--color-border-neutral-medium-hover);
+  --color-border-neutral-medium-press:      var(--color-border-neutral-medium-press);
+  --color-border-neutral-medium-selected:   var(--color-border-neutral-medium-selected);
+
+  --color-border-neutral-light-default:     var(--color-border-neutral-light-default);
+  --color-border-neutral-light-hover:       var(--color-border-neutral-light-hover);
+  --color-border-neutral-light-press:       var(--color-border-neutral-light-press);
+  --color-border-neutral-light-selected:    var(--color-border-neutral-light-selected);
+
+  --color-border-neutral-lightest-default:  var(--color-border-neutral-lightest-default);
+  --color-border-neutral-lightest-hover:    var(--color-border-neutral-lightest-hover);
+  --color-border-neutral-lightest-press:    var(--color-border-neutral-lightest-press);
+  --color-border-neutral-lightest-selected: var(--color-border-neutral-lightest-selected);
+
+  --color-border-negative-default:          var(--color-border-negative-default);
+  --color-border-negative-hover:            var(--color-border-negative-hover);
+  --color-border-negative-press:            var(--color-border-negative-press);
+  --color-border-negative-selected:         var(--color-border-negative-selected);
+
+  /* ── display/* ── */
+  --color-display-indigo-strong:     var(--color-display-indigo-strong);
+  --color-display-indigo-default:    var(--color-display-indigo-default);
+  --color-display-indigo-medium:     var(--color-display-indigo-medium);
+  --color-display-indigo-light:      var(--color-display-indigo-light);
+  --color-display-indigo-on-subtle:  var(--color-display-indigo-on-subtle);
+
+  --color-display-pink-strong:       var(--color-display-pink-strong);
+  --color-display-pink-default:      var(--color-display-pink-default);
+  --color-display-pink-medium:       var(--color-display-pink-medium);
+  --color-display-pink-light:        var(--color-display-pink-light);
+  --color-display-pink-on-subtle:    var(--color-display-pink-on-subtle);
+
+  --color-display-gray-strong:       var(--color-display-gray-strong);
+  --color-display-gray-default:      var(--color-display-gray-default);
+  --color-display-gray-medium:       var(--color-display-gray-medium);
+  --color-display-gray-light:        var(--color-display-gray-light);
+  --color-display-gray-on-subtle:    var(--color-display-gray-on-subtle);
+
+  --color-display-yellow-strong:     var(--color-display-yellow-strong);
+  --color-display-yellow-default:    var(--color-display-yellow-default);
+  --color-display-yellow-medium:     var(--color-display-yellow-medium);
+  --color-display-yellow-light:      var(--color-display-yellow-light);
+  --color-display-yellow-on-subtle:  var(--color-display-yellow-on-subtle);
+
+  --color-display-blue-strong:       var(--color-display-blue-strong);
+  --color-display-blue-default:      var(--color-display-blue-default);
+  --color-display-blue-medium:       var(--color-display-blue-medium);
+  --color-display-blue-light:        var(--color-display-blue-light);
+  --color-display-blue-on-subtle:    var(--color-display-blue-on-subtle);
+
+  --color-display-green-strong:      var(--color-display-green-strong);
+  --color-display-green-default:     var(--color-display-green-default);
+  --color-display-green-medium:      var(--color-display-green-medium);
+  --color-display-green-light:       var(--color-display-green-light);
+  --color-display-green-on-subtle:   var(--color-display-green-on-subtle);
+
+  --color-display-red-strong:        var(--color-display-red-strong);
+  --color-display-red-default:       var(--color-display-red-default);
+  --color-display-red-medium:        var(--color-display-red-medium);
+  --color-display-red-light:         var(--color-display-red-light);
+  --color-display-red-on-subtle:     var(--color-display-red-on-subtle);
+
+  --color-display-primary-strong:    var(--color-display-primary-strong);
+  --color-display-primary-default:   var(--color-display-primary-default);
+  --color-display-primary-medium:    var(--color-display-primary-medium);
+  --color-display-primary-light:     var(--color-display-primary-light);
+  --color-display-primary-on-subtle: var(--color-display-primary-on-subtle);
+
+  /* ── Font utilities ── */
+  --font-family-sans:    var(--font-family-sans);
+  --font-family-display: var(--font-family-display);
+
+  --font-weight-normal:   var(--font-weight-normal);
+  --font-weight-medium:   var(--font-weight-medium);
+  --font-weight-semibold: var(--font-weight-semibold);
+  --font-weight-bold:     var(--font-weight-bold);
+
+  --font-size-display:     var(--font-size-display);
+  --font-size-h1:          var(--font-size-h1);
+  --font-size-h2:          var(--font-size-h2);
+  --font-size-h3:          var(--font-size-h3);
+  --font-size-h4:          var(--font-size-h4);
+  --font-size-body:        var(--font-size-body);
+  --font-size-body-small:  var(--font-size-body-small);
+  --font-size-caption:     var(--font-size-caption);
+  --font-size-small-label: var(--font-size-small-label);
+  --font-size-button:      var(--font-size-button);
+
+  /* ── Line-height utilities (leading-*) ── */
+  --line-height-button: var(--line-height-button);
+
+  /* ── Radius utilities (rounded-*) ── */
+  --radius-action:  var(--radius-action);
+  --radius-rounded: var(--radius-rounded);
+  --radius-xlarge:  var(--radius-xlarge);
+  --radius-large:   var(--radius-large);
+  --radius-medium:  var(--radius-medium);
+  --radius-small:   var(--radius-small);
+  --radius-xsmall:  var(--radius-xsmall);
+  --radius-2xsmall: var(--radius-2xsmall);
+  --radius-3xsmall: var(--radius-3xsmall);
+
+  /* ── Spacing utilities (px-*, py-*, gap-*, m-*, w-*, h-* …) ── */
+  /* Aliases the padding/gap scale from tokens.css under --spacing-* so   */
+  /* Tailwind v4 generates named spacing utilities: px-medium, gap-2xsmall */
+  --spacing-4xlarge: var(--padding-4xlarge);
+  --spacing-3xlarge: var(--padding-3xlarge);
+  --spacing-2xlarge: var(--padding-2xlarge);
+  --spacing-xlarge:  var(--padding-xlarge);
+  --spacing-large:   var(--padding-large);
+  --spacing-medium:  var(--padding-medium);
+  --spacing-small:   var(--padding-small);
+  --spacing-xsmall:  var(--padding-xsmall);
+  --spacing-2xsmall: var(--padding-2xsmall);
+  --spacing-3xsmall: var(--padding-3xsmall);
+
+  --font-sans: var(--font-family-sans);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    @apply font-sans;
+  }
+}
