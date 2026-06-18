@@ -23,7 +23,7 @@ from app.auth.crypto import (
 from app.auth.schemas import RegisterRequest, LoginRequest
 
 router = APIRouter(prefix="/auth")
-http_bearer = HTTPBearer()
+http_bearer = HTTPBearer(auto_error=False)
 
 
 def get_current_user(
@@ -32,6 +32,8 @@ def get_current_user(
     token = request.cookies.get("access_token")
     if not token and credentials:
         token = credentials.credentials
+    if not token:
+        raise HTTPException(401, "Not authenticated")
     try:
         return uuid.UUID(_decode_token(token=token))
     except ExpiredSignatureError:

@@ -11,5 +11,6 @@ class Settings(BaseSettings):
     app_db_name: str
     app_db_host: str
     app_db_port: str
+    session_secret_key: str
 
 settings = Settings()
