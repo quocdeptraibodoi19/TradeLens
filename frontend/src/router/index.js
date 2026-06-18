@@ -4,11 +4,15 @@ import OrdersView from '@/views/OrdersView.vue'
 import AlertsView from '@/views/AlertsView.vue'
 import SymbolsView from '@/views/SymbolsView.vue'
 import PlaceholderView from '@/views/PlaceholderView.vue'
+import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', redirect: '/home' },
+    { path: '/login', name: 'Login', component: LoginView },
+    { path: '/register', name: 'Register', component: RegisterView },
     { path: '/home', name: 'Home', component: DashboardView },
     { path: '/markets', name: 'Markets', component: SymbolsView },
     { path: '/portfolio', name: 'Portfolio', component: PlaceholderView },

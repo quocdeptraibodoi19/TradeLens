@@ -65,6 +65,12 @@ const statusVariant = {
           </template>
           Refresh
         </Button>
+        <Button variant="ghost" iconPosition="left" as="a" href="/auth/alpaca/connect">
+          <template #icon>
+            <font-awesome-icon icon="fa-regular fa-link" />
+          </template>
+          Connect Alpaca
+        </Button>
         <Button variant="accent" iconPosition="left">
           <template #icon>
             <font-awesome-icon icon="fa-regular fa-comment-dots" />
