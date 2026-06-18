@@ -12,5 +12,6 @@ class Settings(BaseSettings):
     app_db_host: str
     app_db_port: str
     session_secret_key: str
+    frontend_url: str = "http://localhost:5173"
 
 settings = Settings()

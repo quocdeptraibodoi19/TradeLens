@@ -154,3 +154,4 @@ async def alpaca_callback(
         db.add(alpaca_token)
 
     db.commit()
+    return RedirectResponse(f"{settings.frontend_url}/home")
