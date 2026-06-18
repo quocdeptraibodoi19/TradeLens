@@ -22,7 +22,7 @@ def _hash_password(password: str) -> str:
 def _verify_password(plain: str, hashed_password: str) -> bool:
     salt, hashed = hashed_password.split(":")
     new_hash = hashlib.pbkdf2_hmac("sha256", plain.encode(), salt.encode(), 100_000)
-    return hashed == new_hash
+    return hashed == new_hash.hex()
 
 def _create_token(user_id: str) -> str:
     payload = {

@@ -4,9 +4,9 @@ import uuid
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from fastapi import APIRouter, Request, Depends
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.exceptions import HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from sqlalchemy.orm import Session
 
@@ -23,10 +23,15 @@ from app.auth.crypto import (
 from app.auth.schemas import RegisterRequest, LoginRequest
 
 router = APIRouter(prefix="/auth")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+http_bearer = HTTPBearer()
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> uuid.UUID:
+def get_current_user(
+    request: Request, credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+) -> uuid.UUID:
+    token = request.cookies.get("access_token")
+    if not token and credentials:
+        token = credentials.credentials
     try:
         return uuid.UUID(_decode_token(token=token))
     except ExpiredSignatureError:
@@ -60,7 +65,15 @@ async def login(body: LoginRequest, db: Session = Depends(get_db)):
         plain=body.password, hashed_password=user.hashed_password
     ):
         raise HTTPException(401, "Invalid credentials")
-    return {"access_token": _create_token(user_id=str(user.id))}
+    response = JSONResponse(content={"message": "logged in"})
+    response.set_cookie(
+        key="access_token",
+        value=_create_token(user_id=str(user.id)),
+        httponly=True,
+        samesite="lax",
+        secure=False,
+    )
+    return response
 
 
 @router.get("/alpaca/connect")
@@ -88,16 +101,18 @@ async def alpaca_callback(
     request: Request,
     code: str,
     state: str,
-    user_id: uuid.UUID = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    stored_state = request.session.pop("oauth_state", None)
-
-    if not stored_state or state != stored_state:
+    # extract user_id from state (set during /alpaca/connect)
+    try:
+        _, user_id_str = state.split(":")
+        user_id = uuid.UUID(user_id_str)
+    except (ValueError, AttributeError):
         raise HTTPException(400, "Invalid state")
 
     callback_url = str(request.base_url) + "auth/alpaca/callback"
     async with httpx.AsyncClient() as client:
+
         response = await client.post(
             url="https://api.alpaca.markets/oauth/token",
             data={
