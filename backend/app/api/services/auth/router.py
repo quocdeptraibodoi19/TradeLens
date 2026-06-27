@@ -13,14 +13,14 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.api.models import UserAlpacaToken, Users
 from app.api.database import get_db
-from app.auth.crypto import (
+from app.api.services.auth.crypto import (
     _encrypt,
     _hash_password,
     _verify_password,
     _create_token,
     _decode_token,
 )
-from app.auth.schemas import RegisterRequest, LoginRequest
+from app.api.services.auth.schemas import RegisterRequest, LoginRequest
 
 router = APIRouter(prefix="/auth")
 http_bearer = HTTPBearer(auto_error=False)

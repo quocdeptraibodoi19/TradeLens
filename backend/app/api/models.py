@@ -29,3 +29,22 @@ class UserAlpacaToken(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
+
+class AlpacaAccInfo(Base):
+    __tablename__ = "alpaca_acc_infos"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, unique=True)
+    account_number = Column(String, nullable=False)
+    currency = Column(String, nullable=False)
+    cash = Column(String, nullable=False)
+    portfolio_value = Column(String, nullable=False)
+    equity = Column(String, nullable=False)
+    last_equity = Column(String, nullable=False)
+    long_market_value = Column(String, nullable=False)
+    short_market_value = Column(String, nullable=False)
+    position_market_value = Column(String, nullable=False)
+    buying_power = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
+

@@ -14,4 +14,10 @@ class Settings(BaseSettings):
     session_secret_key: str
     frontend_url: str = "http://localhost:5173"
 
+    ch_host: str
+    ch_port: int = 8123
+    ch_user: str
+    ch_password: str
+    ch_database: str
+
 settings = Settings()

@@ -15,6 +15,11 @@ services:
       - clickhouse-keeper-01
       - clickhouse-keeper-02
       - clickhouse-keeper-03
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   clickhouse-02:
     image: "clickhouse/clickhouse-server:latest"
     user: "101:101"
@@ -30,6 +35,11 @@ services:
       - clickhouse-keeper-01
       - clickhouse-keeper-02
       - clickhouse-keeper-03
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   clickhouse-03:
     image: "clickhouse/clickhouse-server:latest"
     user: "101:101"
@@ -45,6 +55,11 @@ services:
       - clickhouse-keeper-01
       - clickhouse-keeper-02
       - clickhouse-keeper-03
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   clickhouse-04:
     image: "clickhouse/clickhouse-server:latest"
     user: "101:101"
@@ -60,6 +75,33 @@ services:
       - clickhouse-keeper-01
       - clickhouse-keeper-02
       - clickhouse-keeper-03
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  clickhouse-init:
+    image: "curlimages/curl:latest"
+    container_name: clickhouse-init
+    env_file:
+      - ../.env
+    environment:
+      CH_HOST: clickhouse-01
+      CH_PORT: 8123
+      CH_CLUSTER: cluster_2S_2R
+    volumes:
+      - ./init.sh:/init.sh
+    depends_on:
+      clickhouse-01:
+        condition: service_healthy
+      clickhouse-02:
+        condition: service_healthy
+      clickhouse-03:
+        condition: service_healthy
+      clickhouse-04:
+        condition: service_healthy
+    entrypoint: ["sh", "/init.sh"]
+    restart: "no"
   clickhouse-keeper-01:
     image: "clickhouse/clickhouse-keeper:latest-alpine"
     user: "101:101"
