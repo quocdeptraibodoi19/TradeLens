@@ -16,7 +16,7 @@ if config.config_file_name is not None:
 
 from app.api.models import Base  # noqa: F401
 import app.api.models  # noqa: F401
-from app.api.database import DATABASE_URL
+from app.config import settings
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -37,9 +37,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = DATABASE_URL
     context.configure(
-        url=url,
+        url=settings.postgres_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -60,7 +59,7 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        url=DATABASE_URL,
+        url=settings.postgres_url,
     )
 
     with connectable.connect() as connection:

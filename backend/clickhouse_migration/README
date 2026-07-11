@@ -1,0 +1,7 @@
+ClickHouse (landing zone) migrations. Run with:
+
+    alembic -c clickhouse_alembic.ini revision --autogenerate -m "message"
+    alembic -c clickhouse_alembic.ini upgrade head
+
+Separate from the Postgres migrations (alembic.ini / postgres_migration/)
+since these target a different database, dialect, and revision history.

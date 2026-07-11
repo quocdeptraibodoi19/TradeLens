@@ -1,4 +1,6 @@
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
@@ -19,5 +21,24 @@ class Settings(BaseSettings):
     ch_user: str
     ch_password: str
     ch_database: str
+
+    lz_schema: str = "landing_zone"
+
+    @computed_field
+    @property
+    def postgres_url(self) -> str:
+        return (
+            f"postgresql://{self.app_db_user}:{self.app_db_password}"
+            f"@{self.app_db_host}:{self.app_db_port}/{self.app_db_name}"
+        )
+
+    @computed_field
+    @property
+    def clickhouse_url(self) -> str:
+        return (
+            f"clickhouse+connect://{self.ch_user}:{self.ch_password}"
+            f"@{self.ch_host}:{self.ch_port}/{self.ch_database}"
+        )
+
 
 settings = Settings()
