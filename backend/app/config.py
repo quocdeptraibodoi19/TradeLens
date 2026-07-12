@@ -20,7 +20,6 @@ class Settings(BaseSettings):
     ch_port: int = 8123
     ch_user: str
     ch_password: str
-    ch_database: str
 
     lz_schema: str = "landing_zone"
 
@@ -37,7 +36,7 @@ class Settings(BaseSettings):
     def clickhouse_url(self) -> str:
         return (
             f"clickhouse+connect://{self.ch_user}:{self.ch_password}"
-            f"@{self.ch_host}:{self.ch_port}/{self.ch_database}"
+            f"@{self.ch_host}:{self.ch_port}"
         )
 
 
