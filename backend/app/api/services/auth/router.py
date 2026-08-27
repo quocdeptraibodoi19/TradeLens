@@ -1,45 +1,21 @@
 import secrets
 import httpx
 import uuid
-from jwt import ExpiredSignatureError, InvalidTokenError
 
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.exceptions import HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.api.models import UserAlpacaToken, Users
 from app.api.database import get_db
-from app.api.services.auth.crypto import (
-    _encrypt,
-    _hash_password,
-    _verify_password,
-    _create_token,
-    _decode_token,
-)
+from app.api.services.auth.crypto import _encrypt, _hash_password, _verify_password, _create_token
+from app.dependencies import get_current_user, get_alpaca_access_token
 from app.api.services.auth.schemas import RegisterRequest, LoginRequest
 
 router = APIRouter(prefix="/auth")
-http_bearer = HTTPBearer(auto_error=False)
-
-
-def get_current_user(
-    request: Request, credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
-) -> uuid.UUID:
-    token = request.cookies.get("access_token")
-    if not token and credentials:
-        token = credentials.credentials
-    if not token:
-        raise HTTPException(401, "Not authenticated")
-    try:
-        return uuid.UUID(_decode_token(token=token))
-    except ExpiredSignatureError:
-        raise HTTPException(401, "Token expired")
-    except InvalidTokenError:
-        raise HTTPException(401, "Invalid token")
 
 
 @router.post("/register")

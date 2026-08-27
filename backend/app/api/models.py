@@ -1,9 +1,19 @@
 import uuid
 from datetime import datetime, timezone
+from typing import TypeVar
 
-from sqlalchemy import Column, String, LargeBinary, Boolean, Numeric, DateTime, ForeignKey, MetaData
+from sqlalchemy import (
+    Column,
+    String,
+    LargeBinary,
+    Boolean,
+    Numeric,
+    DateTime,
+    ForeignKey,
+    MetaData,
+)
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 from clickhouse_connect.cc_sqlalchemy.ddl.tableengine import MergeTree
 from clickhouse_connect.cc_sqlalchemy.datatypes.sqltypes import (
     UUID as ChUUID,
@@ -18,7 +28,10 @@ from clickhouse_connect.cc_sqlalchemy.datatypes.sqltypes import (
 
 from app.config import settings
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
+
 
 class Users(Base):
     __tablename__ = "users"
@@ -31,11 +44,14 @@ class Users(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
 
+
 class UserAlpacaToken(Base):
     __tablename__ = "user_alpaca_tokens"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, unique=True)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, unique=True
+    )
     access_token_enc = Column(LargeBinary, nullable=False)
     token_type = Column(String, default="bearer")
     scope = Column(String, nullable=False)
@@ -44,7 +60,8 @@ class UserAlpacaToken(Base):
     updated_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
 
 
-ClickhouseBase = declarative_base(metadata=MetaData(schema=settings.lz_schema))
+class ClickhouseBase(DeclarativeBase):
+    metadata = MetaData(schema=settings.lz_schema)
 
 
 class AlpacaAccountSnapshot(ClickhouseBase):
