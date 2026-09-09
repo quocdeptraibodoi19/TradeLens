@@ -1,0 +1,35 @@
+include:
+ - postgres/docker-compose.yml
+ - clickhouse/docker-compose.yml
+ - redis/docker-compose.yml
+
+x-backend: &backend
+  build: ../backend
+  image: tradelens-backend:latest
+  env_file: .env
+  environment:
+    APP_DB_HOST: postgres
+    CH_HOST: clickhouse-01
+    CH_USER: ch_admin
+    CH_PASSWORD: ch_admin_staging
+    REDIS_HOST: redis
+    REDIS_PORT: 6379
+  depends_on:
+    postgres:
+      condition: service_healthy
+    clickhouse-01:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  api:
+    <<: *backend
+    ports:
+      - "8000:8000"
+  
+  worker:
+    <<: *backend
+    command: ["arq", "app.worker.main.WorkerSettings"]
+    deploy:
+      replicas: 2

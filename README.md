@@ -4,6 +4,196 @@ A pet project simulating a real-life financial data streaming pipeline using Pos
 
 ---
 
+## Local Setup
+
+Gets you from a fresh clone to a running API, worker, Postgres, Redis, and a
+4-node ClickHouse cluster.
+
+### Architecture
+
+```mermaid
+flowchart LR
+    A[Alpaca] --> B[API]
+    B --> C[Queue + Worker]
+    C --> D[(ClickHouse)]
+    D --> E[Dashboard]
+```
+
+The API never talks to Alpaca on the request path. It enqueues a job and
+returns immediately; the worker does the pull and the ClickHouse insert.
+
+### Prerequisites
+
+| Tool | Version | Notes |
+|---|---|---|
+| Docker + Compose v2 | 24+ | `docker compose version` must work (not `docker-compose`) |
+| [uv](https://docs.astral.sh/uv/) | 0.5+ | Python package/venv manager |
+| Python | 3.14 | `uv` installs it for you if missing |
+| Alpaca paper account | — | Needed for OAuth client ID/secret |
+
+Roughly 4 GB of free RAM: the ClickHouse cluster is 4 servers + 3 keepers.
+
+### 1. Environment files
+
+Two `.env` files, for two different consumers:
+
+- `infra/.env` — read by the Compose services (Postgres init, ClickHouse init, containerised api/worker).
+- `backend/.env` — read by `app/config.py` when you run the API or worker **on the host**.
+
+```bash
+cp infra/.env.example infra/.env
+cp backend/.env.example backend/.env
+```
+
+Generate the two secrets and paste them into `backend/.env`:
+
+```bash
+# FERNET — encrypts the stored Alpaca access token
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+
+# SESSION_SECRET_KEY — signs the OAuth session cookie
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Then fill in `ALPACA_APP_CLIENT_ID` / `ALPACA_APP_CLIENT_SECRET` from your
+Alpaca OAuth app, and pick any values you like for the database users
+(`APP_DB_USER`, `CH_ADMIN_USER`, ...) as long as they match between the two
+files.
+
+> `CH_LZ_DATABASE` must be set in `infra/.env` — `infra/clickhouse/init.sh`
+> interpolates it unquoted, so an empty value produces
+> `CREATE DATABASE IF NOT EXISTS ` and the landing zone never gets created.
+
+### 2. Start the infrastructure
+
+Bring up only the datastores, so you can run the API with hot reload on the host:
+
+```bash
+cd infra
+docker compose up -d postgres redis clickhouse-init
+```
+
+`clickhouse-init` pulls in all four ClickHouse servers and three keepers via
+`depends_on`, so there's no need to list them.
+
+Check everything is healthy and the ClickHouse bootstrap succeeded:
+
+```bash
+docker compose ps
+docker compose logs clickhouse-init     # should end with "Done."
+```
+
+### 3. Run the migrations
+
+Two independent Alembic histories — two databases, two dialects, two
+`alembic_version` tables:
+
+```bash
+cd ../backend
+uv sync
+
+uv run alembic upgrade head                             # Postgres: users, user_alpaca_tokens
+uv run alembic -c clickhouse_alembic.ini upgrade head   # ClickHouse: landing_zone.*
+```
+
+Verify both landed:
+
+```bash
+docker exec -it tradelens_postgres psql -U "$APP_DB_USER" -d tradelens -c '\dt'
+
+curl -s 'http://localhost:8123/' -u "$CH_ADMIN_USER:$CH_ADMIN_PASSWORD" \
+     --data 'SHOW TABLES FROM landing_zone'
+```
+
+Expected: `users` + `user_alpaca_tokens` in Postgres,
+`alpaca_account_snapshot` + `alpaca_position_snapshot` in ClickHouse.
+
+### 4. Run the API and the worker
+
+Two terminals, both from `backend/`:
+
+```bash
+uv run uvicorn app.api.main:app --reload --port 8000
+```
+
+```bash
+uv run arq app.worker.main.WorkerSettings
+```
+
+API docs at <http://localhost:8000/docs>.
+
+### 5. Connect Alpaca and trigger a sync
+
+Complete the OAuth flow once in the browser (start from the frontend, or hit
+the auth router directly). That writes an encrypted token row into
+`user_alpaca_tokens` and sets an `access_token` cookie.
+
+Copy that cookie from DevTools -> Application -> Cookies, then:
+
+```bash
+curl -i -X POST http://localhost:8000/dashboard/sync \
+     -b "access_token=<paste-jwt-here>"
+```
+
+Expect a JSON body with two `job_id`s — one for `/v2/account`, one for
+`/v2/positions`.
+
+### 6. Verify the data actually landed
+
+The worker log is not sufficient proof; check the row counts:
+
+```bash
+docker compose -f infra/docker-compose.yml exec redis redis-cli --scan --pattern 'arq:*'
+
+curl -s 'http://localhost:8123/' -u "$CH_ADMIN_USER:$CH_ADMIN_PASSWORD" \
+     --data 'SELECT count() FROM landing_zone.alpaca_account_snapshot'
+```
+
+A worker log showing a completed job alongside `count() = 0` means the insert
+coroutine was never awaited — check for a `RuntimeWarning: coroutine ... was
+never awaited` in the worker output.
+
+### 7. Full containerised run
+
+Once the host-side loop works, build and run everything in Compose:
+
+```bash
+cd infra
+docker compose up -d --build
+docker compose logs -f api worker
+```
+
+### Teardown
+
+```bash
+cd infra
+docker compose down            # stop containers, keep data
+docker compose down -v         # also delete the Postgres and Redis volumes
+```
+
+`down -v` destroys the `postgres_data` and `redis-data` volumes — you'll need
+to re-run both migrations and redo the Alpaca OAuth flow afterwards.
+
+### Troubleshooting
+
+<!-- TODO: fill this in with the failures you actually hit, with the real error
+     text and the fix. This section is what makes a README credible — a
+     stranger can't debug from a template. Candidates so far:
+       - pydantic ValidationError on startup (missing key in backend/.env)
+       - ClickHouse migration fails: "Database landing_zone doesn't exist"
+       - worker job completes instantly, ClickHouse count() stays 0
+-->
+
+### Design decisions
+
+<!-- TODO: three bullets, one line each. Why ClickHouse and not Postgres for
+     the analytics layer; why a task queue instead of syncing inside the
+     request handler; why two separate Alembic histories. Write these in your
+     own words — they're the section an interviewer reads.
+-->
+
+---
+
 ## Prerequisite Knowledge
 
 ### 1. Market Structure

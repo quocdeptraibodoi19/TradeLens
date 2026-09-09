@@ -1,17 +1,16 @@
 import uuid
 
-import httpx
 from fastapi import APIRouter, Depends
 
-from sqlalchemy.orm import Session
 
-from app.dependencies import get_alpaca_access_token, get_current_user
-from app.api.services.dashboard.schemas import (
-    AlpacaUserAccountSnapshotSchema,
-    AlpacaUserPositionSnapshotSchema,
+from app.dependencies import (
+    get_alpaca_access_token,
+    get_current_user,
+    get_arq_redis,
+    ArqRedis,
 )
 from app.api.models import AlpacaAccountSnapshot, AlpacaPositionSnapshot
-from app.api.services.dashboard.sync import get_clickhouse_syncer, ClickhouseSyncer
+from app.api.schemas import JobResponse, SyncResponse
 
 router = APIRouter(prefix="/dashboard")
 
@@ -20,35 +19,30 @@ router = APIRouter(prefix="/dashboard")
 async def sync_dashboard(
     user_id: uuid.UUID = Depends(get_current_user),
     alpaca_token: str = Depends(get_alpaca_access_token),
-    clickhouse_syncer: ClickhouseSyncer = Depends(get_clickhouse_syncer),
-):
+    arq_redis: ArqRedis = Depends(get_arq_redis),
+) -> SyncResponse:
     base_url = "https://paper-api.alpaca.markets/v2"
-    async with httpx.AsyncClient() as client:
-        # Get user account
-        account_response = await client.get(
-            url=f"{base_url}/account",
-            headers={
-                "accept": "application/json",
-                "authorization": f"Bearer {alpaca_token}",
-            },
-        )
-        positions_response = await client.get(
-            url=f"{base_url}/positions",
-            headers={
-                "accept": "application/json",
-                "authorization": f"Bearer {alpaca_token}",
-            },
+    account_url = f"{base_url}/account"
+    positions_url = f"{base_url}/positions"
+
+    jobs = []
+    for model_cls, url in [
+        (AlpacaAccountSnapshot, account_url),
+        (AlpacaPositionSnapshot, positions_url),
+    ]:
+        job = await arq_redis.enqueue_job(
+            "sync_CH_data_from_api", user_id, model_cls, url, alpaca_token
         )
 
-    account = AlpacaUserAccountSnapshotSchema(**account_response.json())
-    positions = [
-        AlpacaUserPositionSnapshotSchema(**position)
-        for position in positions_response.json()
-    ]
+        jobs.append(JobResponse(job_id=job.job_id, url=url))
 
-    clickhouse_syncer.sync_data(
-        user_id=user_id, model_cls=AlpacaAccountSnapshot, response_data=account
-    )
-    clickhouse_syncer.sync_data(
-        user_id=user_id, model_cls=AlpacaPositionSnapshot, response_data=positions
-    )
+    return SyncResponse(jobs=jobs)
+
+
+# @router.get("/account_overview")
+# async def get_account_overview(
+#     user_id: uuid.UUID = Depends(get_current_user),
+#     alpaca_token: str = Depends(get_alpaca_access_token),
+#     clickhouse_syncer: ClickhouseSyncer = Depends(get_clickhouse_syncer),
+# ):
+#     pass

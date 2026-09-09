@@ -23,6 +23,9 @@ class Settings(BaseSettings):
 
     lz_schema: str = "landing_zone"
 
+    redis_host: str
+    redis_port: int
+
     @computed_field
     @property
     def postgres_url(self) -> str:

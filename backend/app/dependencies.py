@@ -4,6 +4,7 @@ from fastapi import Request, Depends
 from fastapi.exceptions import HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import ExpiredSignatureError, InvalidTokenError
+from arq.connections import ArqRedis
 
 from sqlalchemy.orm import Session
 
@@ -42,3 +43,6 @@ def get_alpaca_access_token(
     if not token:
         raise HTTPException(404, "Alpaca account not connected")
     return _decrypt(token.access_token_enc)
+
+def get_arq_redis(request: Request) -> ArqRedis:
+    return request.app.state.redis
