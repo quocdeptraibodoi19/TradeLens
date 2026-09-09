@@ -6,6 +6,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from arq import create_pool
 
 from app.api.services.auth.router import router as auth_router
+from app.api.services.dashboard.router import router as dashboard_router
 from app.config import settings
 from app.worker.main import REDIS_SETTINGS
 
@@ -30,3 +31,4 @@ app.add_middleware(
 app.add_middleware(SessionMiddleware, secret_key=settings.session_secret_key)
 
 app.include_router(auth_router)
+app.include_router(dashboard_router)
