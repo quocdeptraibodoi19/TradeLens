@@ -23,6 +23,19 @@ from app.config import settings
 
 target_metadata = ClickhouseBase.metadata
 
+
+def include_name(name, type_, parent_names):
+    """Only compare the schema our models live in.
+
+    include_schemas=True makes Alembic reflect every ClickHouse database
+    (system, INFORMATION_SCHEMA, ...). Those aren't in our metadata, so
+    without this fence they'd show up as tables to drop -- and some carry
+    types the SQLAlchemy dialect can't parse (e.g. Dynamic).
+    """
+    if type_ == "schema":
+        return name == settings.lz_schema
+    return True
+
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
@@ -46,6 +59,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_schemas=True,
+        include_name=include_name,
         include_object=include_object,
         process_revision_directives=clickhouse_writer,
     )
@@ -72,6 +87,8 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
+            include_schemas=True,
+            include_name=include_name,
             include_object=include_object,
             process_revision_directives=clickhouse_writer,
         )
