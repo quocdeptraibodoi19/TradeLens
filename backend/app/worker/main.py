@@ -17,7 +17,7 @@ CLICKHOUSE_SETTINGS = {
 
 
 async def startup(ctx):
-    clickhouse_client = clickhouse_connect.get_async_client(**CLICKHOUSE_SETTINGS)
+    clickhouse_client = await clickhouse_connect.get_async_client(**CLICKHOUSE_SETTINGS)
     ctx["clickhouse_client"] = clickhouse_client
     ctx["network_client"] = AsyncClient()
 

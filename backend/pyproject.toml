@@ -13,6 +13,7 @@ dependencies = [
     "cryptography>=49.0.0",
     "fastapi[standard]>=0.136.1",
     "finnhub-python>=2.4.27",
+    "ijson>=3.5.1",
     "itsdangerous>=2.2.0",
     "psycopg2-binary>=2.9.12",
     "pyarrow>=25.0.0",

@@ -9,7 +9,7 @@ from app.dependencies import (
     get_arq_redis,
     ArqRedis,
 )
-from app.api.models import AlpacaAccountSnapshot, AlpacaPositionSnapshot
+from app.api.services.dashboard.data_sources import AccountDataSource, PosititonsDataSource
 from app.api.schemas import JobResponse, SyncResponse
 
 router = APIRouter(prefix="/dashboard")
@@ -26,15 +26,15 @@ async def sync_dashboard(
     positions_url = f"{base_url}/positions"
 
     jobs = []
-    for model_cls, url in [
-        (AlpacaAccountSnapshot, account_url),
-        (AlpacaPositionSnapshot, positions_url),
+    for source_cls in [
+        AccountDataSource,
+        PosititonsDataSource
     ]:
         job = await arq_redis.enqueue_job(
-            "sync_CH_data_from_api", user_id, model_cls, url, alpaca_token
+            "sync_CH_data_from_api", user_id, source_cls, alpaca_token
         )
 
-        jobs.append(JobResponse(job_id=job.job_id, url=url))
+        jobs.append(JobResponse(job_id=job.job_id, url=source_cls.url))
 
     return SyncResponse(jobs=jobs)
 

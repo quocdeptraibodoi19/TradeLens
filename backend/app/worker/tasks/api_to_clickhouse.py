@@ -1,4 +1,3 @@
-import json
 import uuid
 from typing import Type, Any, Iterable
 from datetime import datetime, UTC
@@ -17,24 +16,27 @@ from clickhouse_connect.cc_sqlalchemy.datatypes.sqltypes import (
 )
 from httpx import AsyncClient
 from clickhouse_connect.driver.asyncclient import AsyncClient as CHAsyncClient
+from app.api.services.dashboard.data_sources import DataSource, Reader
+from app.api.schemas import AlpacaPayload
 
-from app.api.models import ClickhouseBase
 
-
-async def stream_records(client: AsyncClient, url: str, token: str, user_id: str):
+async def stream_records(
+    client: AsyncClient,
+    url: str,
+    token: str,
+    user_id: uuid.UUID,
+    data_reader: Reader,
+    payload_cls: Type[AlpacaPayload],
+):
     batched_at = datetime.now(tz=UTC)
     headers = {
         "accept": "application/json",
         "authorization": f"Bearer {token}",
     }
-    async with client.stream("GET", url=url, headers=headers) as stream_response:
-        stream_response.raise_for_status()
-        for line in stream_response.aiter_lines():
-            if line:
-                json_data = json.loads(line)
-                json_data["user_id"] = user_id
-                json_data["batched_at"] = batched_at
-                yield json_data
+    async for record in data_reader(client, url, headers):
+        record["user_id"] = user_id
+        record["batched_at"] = batched_at
+        yield payload_cls(**record).model_dump()
 
 
 async def stream_batches(
@@ -82,35 +84,52 @@ def _sqlalchemy_type_to_arrow(type_: Any) -> pa.DataType:
         return pa.date64()
 
     if isinstance(type_, ChDecimal):
-        return pa.decimal128()
+        return pa.decimal128(type_.ch_type.prec, type_.ch_type.scale)
 
 
 async def ingest_data_to_CH(
-    table_name: str, client: CHAsyncClient, record_batches: Iterable[pa.RecordBatch]
+    database_name: str,
+    table_name: str,
+    client: CHAsyncClient,
+    record_batches: Iterable[pa.RecordBatch],
 ):
     async for batch in record_batches:
-        client.insert(table=table_name, data=batch)
+        await client.insert_arrow(
+            table=table_name,
+            arrow_table=pa.Table.from_batches([batch]),
+            database=database_name,
+        )
 
 
 async def sync_CH_data_from_api(
     ctx,
     user_id: uuid.UUID,
-    model_cls: Type[ClickhouseBase],
-    api_url: str,
+    source_cls: Type[DataSource],
     token: str,
 ):
     client: AsyncClient = ctx["network_client"]
     clickhouse_client: CHAsyncClient = ctx["clickhouse_client"]
-    table_name = model_cls.__tablename__
-    schema = sqlalchemy_to_pyschema(columns=inspect(model_cls).columns)
+    model_class = source_cls.model
+    validation_class = source_cls.validation
+    api_url = source_cls.url
+    data_reader = source_cls.get_reader()
+    table_name = model_class.__tablename__
+    database_name = model_class.__table__.schema
+    schema = sqlalchemy_to_pyschema(columns=inspect(model_class).columns)
 
-    ingest_data_to_CH(
+    await ingest_data_to_CH(
+        database_name=database_name,
         table_name=table_name,
         client=clickhouse_client,
         record_batches=stream_batches(
             schema=schema,
             records=stream_records(
-                client=client, url=api_url, token=token, user_id=user_id
+                client=client,
+                url=api_url,
+                token=token,
+                user_id=user_id,
+                data_reader=data_reader,
+                payload_cls=validation_class,
             ),
         ),
     )
