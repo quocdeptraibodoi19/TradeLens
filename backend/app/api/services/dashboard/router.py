@@ -21,9 +21,6 @@ async def sync_dashboard(
     alpaca_token: str = Depends(get_alpaca_access_token),
     arq_redis: ArqRedis = Depends(get_arq_redis),
 ) -> SyncResponse:
-    base_url = "https://paper-api.alpaca.markets/v2"
-    account_url = f"{base_url}/account"
-    positions_url = f"{base_url}/positions"
 
     jobs = []
     for source_cls in [
