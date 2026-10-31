@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal, ROUND_HALF_EVEN
 from uuid import UUID
 from typing import Any, Annotated
@@ -22,6 +22,16 @@ class JobResponse(BaseModel):
 
 class SyncResponse(BaseModel):
     jobs: list[JobResponse]
+
+
+class AccountOverviewOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    portfolio_value: Decimal
+    equity: Decimal
+    cash: Decimal
+    buying_power: Decimal
+    batched_at: datetime
 
 
 UUIDStr = Annotated[UUID, PlainSerializer(str, return_type=str)]

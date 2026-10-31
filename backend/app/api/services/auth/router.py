@@ -19,7 +19,7 @@ router = APIRouter(prefix="/auth")
 
 
 @router.post("/register")
-async def register(body: RegisterRequest, db: Session = Depends(get_db)):
+def register(body: RegisterRequest, db: Session = Depends(get_db)):
     existing = db.query(Users).filter(Users.email == body.email).first()
     if existing:
         raise HTTPException(400, "Email already registered")
@@ -37,7 +37,7 @@ async def register(body: RegisterRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-async def login(body: LoginRequest, db: Session = Depends(get_db)):
+def login(body: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(Users).filter(Users.email == body.email).first()
     if not user or not _verify_password(
         plain=body.password, hashed_password=user.hashed_password
@@ -75,7 +75,7 @@ async def alpaca_connect(
 
 
 @router.get("/alpaca/callback")
-async def alpaca_callback(
+def alpaca_callback(
     request: Request,
     code: str,
     state: str,
@@ -89,9 +89,8 @@ async def alpaca_callback(
         raise HTTPException(400, "Invalid state")
 
     callback_url = str(request.base_url) + "auth/alpaca/callback"
-    async with httpx.AsyncClient() as client:
-
-        response = await client.post(
+    with httpx.Client() as client:
+        response = client.post(
             url="https://api.alpaca.markets/oauth/token",
             data={
                 "grant_type": "authorization_code",
