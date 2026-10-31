@@ -1,5 +1,5 @@
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_EVEN
 from uuid import UUID
 from typing import Any, Annotated
 
@@ -9,6 +9,7 @@ from pydantic import (
     ConfigDict,
     AliasChoices,
     model_validator,
+    field_validator,
     Field,
     PlainSerializer
 )
@@ -24,6 +25,10 @@ class SyncResponse(BaseModel):
 
 
 UUIDStr = Annotated[UUID, PlainSerializer(str, return_type=str)]
+
+# Must match the scale of the Decimal(38, 10) columns in the ClickHouse landing zone
+CH_DECIMAL_SCALE = 10
+
 
 class AlpacaPayload(BaseModel):
     model_config = ConfigDict(
@@ -43,6 +48,13 @@ class AlpacaPayload(BaseModel):
                 for k, v in data.items()
             }
         return data
+
+    @field_validator("*", mode="after")
+    @classmethod
+    def quantize_decimals(cls, v: Any) -> Any:
+        if isinstance(v, Decimal):
+            return v.quantize(Decimal(1).scaleb(-CH_DECIMAL_SCALE), rounding=ROUND_HALF_EVEN)
+        return v
 
 
 class AlpacaAccountPayload(AlpacaPayload):
