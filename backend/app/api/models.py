@@ -112,7 +112,7 @@ class AlpacaAccountSnapshot(ClickhouseBase):
     sma = Column(ChNullable(ChDecimal(38, 10)))
 
     # flags
-    pattern_day_trader = Column(ChBool, nullable=False)
+    pattern_day_trader = Column(ChNullable(ChBool))
     trading_blocked = Column(ChBool, nullable=False)
     transfers_blocked = Column(ChBool, nullable=False)
     account_blocked = Column(ChBool, nullable=False)
@@ -121,7 +121,7 @@ class AlpacaAccountSnapshot(ClickhouseBase):
 
     # misc
     multiplier = Column(ChNullable(ChString))
-    daytrade_count = Column(ChInt32, nullable=False)
+    daytrade_count = Column(ChNullable(ChInt32))
     balance_asof = Column(ChNullable(ChDate))
     crypto_tier = Column(ChNullable(ChInt32))
 

@@ -86,7 +86,7 @@ class AlpacaAccountPayload(AlpacaPayload):
     sma: Decimal | None = None
 
     # flags
-    pattern_day_trader: bool
+    pattern_day_trader: bool | None = None
     trading_blocked: bool
     transfers_blocked: bool
     account_blocked: bool
@@ -95,7 +95,7 @@ class AlpacaAccountPayload(AlpacaPayload):
 
     # misc
     multiplier: str | None = None
-    daytrade_count: int
+    daytrade_count: int | None = None
     balance_asof: date | None = None
     crypto_tier: int | None = None
 
