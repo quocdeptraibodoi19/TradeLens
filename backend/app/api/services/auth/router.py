@@ -13,7 +13,7 @@ from app.api.models import UserAlpacaToken, Users
 from app.api.database import get_db
 from app.api.services.auth.crypto import _encrypt, _hash_password, _verify_password, _create_token
 from app.dependencies import get_current_user, get_alpaca_access_token
-from app.api.services.auth.schemas import RegisterRequest, LoginRequest
+from app.api.services.auth.schemas import RegisterRequest, LoginRequest, MeResponse
 
 router = APIRouter(prefix="/auth")
 
@@ -51,6 +51,23 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
         samesite="lax",
         secure=False,
     )
+    return response
+
+
+@router.get("/me")
+def me(
+    user_id: uuid.UUID = Depends(get_current_user), db: Session = Depends(get_db)
+) -> MeResponse:
+    user = db.get(Users, user_id)
+    if user is None:
+        raise HTTPException(401, "Not authenticated")
+    return MeResponse.model_validate(user)
+
+
+@router.post("/logout")
+async def logout():
+    response = JSONResponse(content={"message": "logged out"})
+    response.delete_cookie(key="access_token", httponly=True, samesite="lax", secure=False)
     return response
 
 

@@ -31,6 +31,7 @@ class AccountOverviewOut(BaseModel):
     equity: Decimal
     cash: Decimal
     buying_power: Decimal
+    last_equity: Decimal | None
     batched_at: datetime
 
 class HoldingOut(BaseModel):
