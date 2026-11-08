@@ -33,6 +33,18 @@ class AccountOverviewOut(BaseModel):
     buying_power: Decimal
     batched_at: datetime
 
+class HoldingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    symbol: str
+    qty: Decimal
+    market_value: Decimal | None
+    unrealized_pl: Decimal | None
+
+class HoldingsOut(BaseModel):
+    holdings: list[HoldingOut]
+    total: int
+    batched_at: datetime | None
 
 UUIDStr = Annotated[UUID, PlainSerializer(str, return_type=str)]
 

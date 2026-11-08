@@ -1,8 +1,8 @@
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.exceptions import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from app.dependencies import (
@@ -16,8 +16,14 @@ from app.api.services.dashboard.data_sources import (
     AccountDataSource,
     PosititonsDataSource,
 )
-from app.api.schemas import JobResponse, SyncResponse, AccountOverviewOut
-from app.api.models import AlpacaAccountSnapshot
+from app.api.schemas import (
+    JobResponse,
+    SyncResponse,
+    AccountOverviewOut,
+    HoldingsOut,
+    HoldingOut,
+)
+from app.api.models import AlpacaAccountSnapshot, AlpacaPositionSnapshot
 
 router = APIRouter(prefix="/dashboard")
 
@@ -57,3 +63,50 @@ def get_account_overview(
         )
 
     return AccountOverviewOut.model_validate(obj=data)
+
+
+@router.get("/holdings")
+def get_holdings(
+    user_id: uuid.UUID = Depends(get_current_user),
+    ch_db: Session = Depends(get_ch_db),
+    limit: int = Query(default=50, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+) -> HoldingsOut:
+    latest_batched_at = (
+        select(func.max(AlpacaPositionSnapshot.batched_at))
+        .where(AlpacaPositionSnapshot.user_id == user_id)
+        .scalar_subquery()
+    )
+    stmt = (
+        select(AlpacaPositionSnapshot)
+        .where(
+            AlpacaPositionSnapshot.user_id == user_id,
+            AlpacaPositionSnapshot.batched_at == latest_batched_at,
+        )
+        .order_by(
+            AlpacaPositionSnapshot.market_value.desc(), AlpacaPositionSnapshot.symbol
+        )
+        .offset(offset)
+        .limit(limit)
+    )
+    total_stmt = (
+        select(func.count())
+        .select_from(AlpacaPositionSnapshot)
+        .where(
+            AlpacaPositionSnapshot.user_id == user_id,
+            AlpacaPositionSnapshot.batched_at == latest_batched_at,
+        )
+    )
+    all_holdings = ch_db.scalars(stmt).all()
+    holdings_cnt = ch_db.scalars(total_stmt).one()
+    return HoldingsOut(
+        holdings=all_holdings,
+        total=holdings_cnt,
+        batched_at=all_holdings[0].batched_at if all_holdings else None,
+    )
+
+# TODO: Onboarding the order ingestion into clickhouse and then will build a dedup on the fly to get the data
+# TODO: In the future, we introduce a cronjob to dedup the data and to build a data mart
+# @router.get("/orders")
+# def get_orders():
+#     pass
