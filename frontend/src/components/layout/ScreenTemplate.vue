@@ -1,6 +1,8 @@
 <script setup>
 import { Navbar } from '@/components/ui/navbar'
 
+defineEmits(['logout'])
+
 defineProps({
   userName: { type: String, default: '' },
   userSrc: { type: String, required: false },
@@ -9,7 +11,7 @@ defineProps({
 
 <template>
   <div class="min-h-screen bg-bg-canvas flex flex-col text-content-neutral-strong">
-    <Navbar :user-name="userName" :user-src="userSrc" />
+    <Navbar :user-name="userName" :user-src="userSrc" @logout="$emit('logout')" />
     <main class="flex flex-1 flex-col items-center p-4xlarge">
       <div class="w-full max-w-[1440px]">
         <slot />

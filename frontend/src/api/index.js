@@ -45,3 +45,40 @@ export async function fetchSymbols() {
   if (!res.ok) throw new Error(`Failed to fetch symbols: ${res.status}`)
   return res.json()
 }
+
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message)
+    this.status = status
+  }
+}
+
+async function getJson(url, options) {
+  const res = await fetch(url, options)
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new ApiError(err.detail || `Request failed: ${res.status}`, res.status)
+  }
+  return res.json()
+}
+
+export function fetchAccountOverview() {
+  return getJson(`${BASE}/dashboard/account_overview`)
+}
+
+export function fetchHoldings(limit = 5, offset = 0) {
+  const params = new URLSearchParams({ limit, offset })
+  return getJson(`${BASE}/dashboard/holdings?${params}`)
+}
+
+export function syncDashboard() {
+  return getJson(`${BASE}/dashboard/sync`, { method: 'POST' })
+}
+
+export function logout() {
+  return getJson(`${AUTH}/logout`, { method: 'POST' })
+}
+
+export function fetchMe() {
+  return getJson(`${AUTH}/me`)
+}
