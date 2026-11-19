@@ -5,6 +5,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import ExpiredSignatureError, InvalidTokenError
 from arq.connections import ArqRedis
+from httpx import AsyncClient
 
 from sqlalchemy.orm import Session
 
@@ -46,3 +47,7 @@ def get_alpaca_access_token(
 
 def get_arq_redis(request: Request) -> ArqRedis:
     return request.app.state.redis
+
+
+def get_http_client(request: Request) -> AsyncClient:
+    return request.app.state.http

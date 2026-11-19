@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from arq import create_pool
+from httpx import AsyncClient
 
 from app.api.services.auth.router import router as auth_router
 from app.api.services.dashboard.router import router as dashboard_router
@@ -15,7 +16,9 @@ from app.worker.main import REDIS_SETTINGS
 async def lifespan(app: FastAPI):
     redis_pool = await create_pool(REDIS_SETTINGS)
     app.state.redis = redis_pool
+    app.state.http = AsyncClient(timeout=10)
     yield
+    await app.state.http.aclose()
     await redis_pool.close()
 
 

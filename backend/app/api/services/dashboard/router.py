@@ -1,17 +1,17 @@
 import uuid
+from decimal import Decimal
 
 from fastapi import APIRouter, Depends, Query
-from fastapi.exceptions import HTTPException
-from sqlalchemy import select, func
-from sqlalchemy.orm import Session
+from httpx import AsyncClient
 
 from app.dependencies import (
     get_alpaca_access_token,
     get_current_user,
     get_arq_redis,
+    get_http_client,
     ArqRedis,
 )
-from app.api.database import get_ch_db
+from app.api.services.dashboard.alpaca_live import cache_key, fetch_alpaca, get_or_fetch
 from app.api.services.dashboard.data_sources import (
     AccountDataSource,
     PosititonsDataSource,
@@ -21,15 +21,13 @@ from app.api.schemas import (
     SyncResponse,
     AccountOverviewOut,
     HoldingsOut,
-    HoldingOut,
 )
-from app.api.models import AlpacaAccountSnapshot, AlpacaPositionSnapshot
 
 router = APIRouter(prefix="/dashboard")
 
 
-@router.post("/sync")
-async def sync_dashboard(
+@router.post("/sync_analytics")
+async def sync_analytics(
     user_id: uuid.UUID = Depends(get_current_user),
     alpaca_token: str = Depends(get_alpaca_access_token),
     arq_redis: ArqRedis = Depends(get_arq_redis),
@@ -46,64 +44,58 @@ async def sync_dashboard(
     return SyncResponse(jobs=jobs)
 
 
-@router.get("/account_overview")
-def get_account_overview(
-    user_id: uuid.UUID = Depends(get_current_user), ch_db: Session = Depends(get_ch_db)
-) -> AccountOverviewOut:
-    stmt = (
-        select(AlpacaAccountSnapshot)
-        .where(AlpacaAccountSnapshot.user_id == user_id)
-        .order_by(AlpacaAccountSnapshot.batched_at.desc())
-        .limit(1)
+@router.post("/sync")
+async def sync_dashboard(
+    user_id: uuid.UUID = Depends(get_current_user),
+    redis: ArqRedis = Depends(get_arq_redis),
+):
+    await redis.delete(
+        cache_key("account", user_id),
+        cache_key("positions", user_id),
     )
-    data = ch_db.scalars(stmt).first()
-    if data is None:
-        raise HTTPException(
-            404, "Data is not available yet. Please sync the data first"
-        )
+    return {"refreshed": True}
 
-    return AccountOverviewOut.model_validate(obj=data)
+
+@router.get("/account_overview")
+async def get_account_overview(
+    user_id: uuid.UUID = Depends(get_current_user),
+    alpaca_token: str = Depends(get_alpaca_access_token),
+    redis: ArqRedis = Depends(get_arq_redis),
+    http_client: AsyncClient = Depends(get_http_client),
+) -> AccountOverviewOut:
+    account, fetched_at = await get_or_fetch(
+        redis,
+        cache_key("account", user_id),
+        lambda: fetch_alpaca(http_client, AccountDataSource.url, alpaca_token),
+    )
+    return AccountOverviewOut.model_validate({**account, "batched_at": fetched_at})
 
 
 @router.get("/holdings")
-def get_holdings(
+async def get_holdings(
     user_id: uuid.UUID = Depends(get_current_user),
-    ch_db: Session = Depends(get_ch_db),
+    alpaca_token: str = Depends(get_alpaca_access_token),
+    redis: ArqRedis = Depends(get_arq_redis),
+    http_client: AsyncClient = Depends(get_http_client),
     limit: int = Query(default=50, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
 ) -> HoldingsOut:
-    latest_batched_at = (
-        select(func.max(AlpacaPositionSnapshot.batched_at))
-        .where(AlpacaPositionSnapshot.user_id == user_id)
-        .scalar_subquery()
+    positions, fetched_at = await get_or_fetch(
+        redis,
+        cache_key("positions", user_id),
+        lambda: fetch_alpaca(http_client, PosititonsDataSource.url, alpaca_token),
     )
-    stmt = (
-        select(AlpacaPositionSnapshot)
-        .where(
-            AlpacaPositionSnapshot.user_id == user_id,
-            AlpacaPositionSnapshot.batched_at == latest_batched_at,
-        )
-        .order_by(
-            AlpacaPositionSnapshot.market_value.desc(), AlpacaPositionSnapshot.symbol
-        )
-        .offset(offset)
-        .limit(limit)
+    # Positions are bounded by portfolio size, so sorting and paging in memory is fine
+    ranked = sorted(
+        positions,
+        key=lambda p: (-Decimal(p.get("market_value") or 0), p["symbol"]),
     )
-    total_stmt = (
-        select(func.count())
-        .select_from(AlpacaPositionSnapshot)
-        .where(
-            AlpacaPositionSnapshot.user_id == user_id,
-            AlpacaPositionSnapshot.batched_at == latest_batched_at,
-        )
-    )
-    all_holdings = ch_db.scalars(stmt).all()
-    holdings_cnt = ch_db.scalars(total_stmt).one()
     return HoldingsOut(
-        holdings=all_holdings,
-        total=holdings_cnt,
-        batched_at=all_holdings[0].batched_at if all_holdings else None,
+        holdings=ranked[offset : offset + limit],
+        total=len(ranked),
+        batched_at=fetched_at,
     )
+
 
 # TODO: Onboarding the order ingestion into clickhouse and then will build a dedup on the fly to get the data
 # TODO: In the future, we introduce a cronjob to dedup the data and to build a data mart
